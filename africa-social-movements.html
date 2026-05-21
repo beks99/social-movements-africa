@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social Movements in Africa</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f9f9f8;
+      color: #1a1a1a;
+      padding: 24px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    @media (prefers-color-scheme: dark) {
+      body { background: #111; color: #eee; }
+      .metric { background: #1e1e1e !important; }
+      .event-card { background: #1a1a1a !important; border-color: #333 !important; }
+      .slider-box { background: #1e1e1e !important; border-color: #333 !important; }
+    }
+    h1 { font-size: 22px; font-weight: 500; margin-bottom: 2px; }
+    .subtitle { font-size: 13px; color: #666; margin-bottom: 20px; }
+    .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
+    .metric { background: #f0ede8; border-radius: 8px; padding: 14px; text-align: center; }
+    .metric-label { font-size: 11px; color: #888; margin-bottom: 3px; }
+    .metric-value { font-size: 22px; font-weight: 500; }
+    .slider-box { border: 0.5px solid #ddd; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; background: #f5f3ee; }
+    .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 12px; color: #888; }
+    .slider-header span:last-child { font-size: 13px; font-weight: 500; color: #1a1a1a; }
+    .range-wrap { position: relative; height: 36px; }
+    .range-wrap input[type=range] { position: absolute; width: 100%; pointer-events: none; appearance: none; -webkit-appearance: none; height: 4px; background: transparent; }
+    .range-wrap input[type=range]::-webkit-slider-thumb { pointer-events: all; appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid #3266ad; cursor: pointer; }
+    .range-wrap input[type=range]::-moz-range-thumb { pointer-events: all; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid #3266ad; cursor: pointer; }
+    #range-track { position: absolute; top: 16px; left: 0; right: 0; height: 4px; background: #ddd; border-radius: 2px; }
+    #range-fill { position: absolute; top: 0; height: 4px; background: #3266ad; border-radius: 2px; }
+    .tick-row { display: flex; justify-content: space-between; margin-top: 4px; font-size: 10px; color: #aaa; }
+    #map-outer { position: relative; }
+    #map-container { width: 100%; border: 0.5px solid #ddd; border-radius: 12px; overflow: visible; }
+    .rich-tooltip {
+      position: absolute; pointer-events: none;
+      background: #fff; border: 0.5px solid #ccc; border-radius: 12px;
+      padding: 10px; width: 250px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      display: none; z-index: 10;
+    }
+    .rich-tooltip.visible { display: flex; gap: 10px; align-items: flex-start; }
+    .rich-tooltip img { width: 72px; height: 54px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+    .tip-img-placeholder { width: 72px; height: 54px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .tip-text { flex: 1; min-width: 0; }
+    .tip-country { font-size: 10px; font-weight: 500; color: #888; margin-bottom: 3px; }
+    .tip-headline { font-size: 12px; font-weight: 500; color: #1a1a1a; line-height: 1.35; }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .legend span { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: #666; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+    #country-view { display: none; }
+    .back-btn { background: none; border: 0.5px solid #ccc; border-radius: 8px; padding: 6px 14px; cursor: pointer; font-size: 13px; color: #666; display: inline-flex; align-items: center; gap: 6px; }
+    .back-btn:hover { background: #f5f3ee; }
+    .country-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 8px; }
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .chart-label { font-size: 12px; color: #888; margin-bottom: 8px; }
+    .chart-wrap { position: relative; height: 160px; }
+    .timeline-wrap { margin-top: 4px; }
+    .tl-item { display: flex; gap: 12px; margin-bottom: 8px; align-items: flex-start; }
+    .tl-line { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 4px; }
+    .tl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .tl-connector { width: 1px; flex: 1; min-height: 30px; background: #e0e0e0; }
+    .event-card { border: 0.5px solid #e5e5e5; border-radius: 12px; padding: 12px 14px; flex: 1; background: #fff; }
+    .event-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+    .event-year { font-size: 11px; font-weight: 500; color: #888; }
+    .event-theme { font-size: 10px; padding: 1px 7px; border-radius: 20px; }
+    .event-headline { font-size: 13px; font-weight: 500; margin-bottom: 4px; line-height: 1.4; }
+    .event-text { font-size: 12px; color: #666; line-height: 1.5; }
+    .event-inner { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+    .event-img { width: 80px; height: 60px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+    .section-title { font-size: 13px; font-weight: 500; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+
+<h1>Social movements in Africa</h1>
+<p class="subtitle" id="subtitle-text">Click a country bubble to explore its protest history.</p>
+
+<div id="map-view">
+  <div class="metrics-row" id="metrics-row"></div>
+
+  <div class="slider-box">
+    <div class="slider-header">
+      <span>Filter by year</span>
+      <span id="year-label">2008 – 2024</span>
+    </div>
+    <div class="range-wrap">
+      <div id="range-track"><div id="range-fill"></div></div>
+      <input type="range" id="range-min" min="2008" max="2024" value="2008" step="1" />
+      <input type="range" id="range-max" min="2008" max="2024" value="2024" step="1" />
+    </div>
+    <div class="tick-row">
+      <span>2008</span><span>2012</span><span>2016</span><span>2020</span><span>2024</span>
+    </div>
+  </div>
+
+  <div id="map-outer">
+    <div id="map-container"></div>
+    <div class="rich-tooltip" id="rich-tooltip">
+      <div class="tip-img-placeholder" id="tip-img-wrap"></div>
+      <div class="tip-text">
+        <div class="tip-country" id="tip-country"></div>
+        <div class="tip-headline" id="tip-headline"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+</div>
+
+<div id="country-view"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const EVENTS = [
+  {year:2008,country:"South Africa",headline:"Thousands march against xenophobic attacks",text:"Thousands of South African citizens joined together in the march against xenophobic attacks which affected non-nationals living in South Africa.",media:"https://lh4.googleusercontent.com/8xjKbT5T7YVflub1saL17iRR02Vb_Hb0cGq55nGGgK3DrLm67QGjolwsuN6zGOhTELLoCH7Jdc5bKQN0Gq_1KQ6TBJPS29-FlhdtTxcSU9pTBvNMajfIUDLN4hn7oz8-EOLvbkZlLg",theme:"Xenophobia"},
+  {year:2008,country:"Zimbabwe",headline:"42 Women at March Against Hunger",text:"A group of citizens staged a peaceful protest against hunger in the streets of Harare bemoaning the economic crisis.",media:"",theme:"Economic"},
+  {year:2008,country:"Zimbabwe",headline:"Zimbabwe Police Break Up Protest",text:"Scores of health workers protested demanding better salaries and working conditions.",media:"https://static01.nyt.com/images/2008/12/03/world/03zimbabwe-600.jpg?quality=75&auto=webp",theme:"Labour"},
+  {year:2009,country:"South Africa",headline:"Service Delivery Protests in South Africa",text:"Residents staged protests against municipal authorities over poor service delivery.",media:"",theme:"Service Delivery"},
+  {year:2009,country:"Nigeria",headline:"Niger opposition groups protest President Tandja",text:"Opposition groups staged a series of protests against President Tandja's attempt to extend his term.",media:"",theme:"Political"},
+  {year:2010,country:"Lesotho",headline:"Lesotho people march to become part of South Africa",text:"Thousands held a march with a petition of 30,000 signatures to be part of South Africa.",media:"",theme:"Political"},
+  {year:2010,country:"Mozambique",headline:"Food riots and food Rights ravage Mozambique",text:"Citizens took to the streets protesting the high cost of living due to price hikes.",media:"",theme:"Economic"},
+  {year:2011,country:"Botswana",headline:"Botswana - Historic public workers strike",text:"Hundreds of thousands of public service workers embarked on mass strikes over salaries.",media:"",theme:"Labour"},
+  {year:2011,country:"Zambia",headline:"Zambia: Women for Change strengthens political participation",text:"Zambian citizens formed 'The Zambia We Want' Campaign on governance accountability.",media:"",theme:"Governance"},
+  {year:2012,country:"Nigeria",headline:"#Occupy: Nigeria",text:"Protesters took to the streets across Nigeria after the government removed fuel subsidies.",media:"https://www.aljazeera.com/wp-content/uploads/2012/01/2012121142638382580_20.jpeg?resize=570%2C380",theme:"Economic"},
+  {year:2012,country:"Eswatini",headline:"Swaziland protest silenced",text:"Citizens marched against the monarch's lack of democracy and political despondency.",media:"",theme:"Political"},
+  {year:2012,country:"Senegal",headline:"#YenAMarre Senegal",text:"Movement opposing President Abdoulaye Wade's 2012 run for a third term.",media:"",theme:"Political"},
+  {year:2012,country:"Zimbabwe",headline:"Water conservation campaign in Zimbabwe",text:"A collaborative campaign raising awareness for water conservation during a cholera crisis.",media:"",theme:"Environment"},
+  {year:2013,country:"Egypt",headline:"The June 30 Revolution",text:"Enormous anti-Morsi rallies across Egypt amid political tension and worsening economic conditions.",media:"https://see.news/wp-content/uploads/2020/06/85abed41-924a-4607-aa4a-62343fb88b92.jpg",theme:"Political"},
+  {year:2013,country:"Burkina Faso",headline:"#Le Balai Citoyen",text:"Movement inspired by revolt against longstanding president Blaise Compaoré, leading to his resignation.",media:"",theme:"Political"},
+  {year:2013,country:"Libya",headline:"#Zaykum Zayna: Libya",text:"A campaign for advancement of rights of persons living with disabilities.",media:"",theme:"Human Rights"},
+  {year:2014,country:"Tunisia",headline:"Revolutionary Protests: Tunisia",text:"Protests due to citizen dissatisfaction towards poor economic conditions and political instability.",media:"https://foreignpolicy.com/wp-content/uploads/2014/01/tunisiaprotest_06.jpg?quality=90",theme:"Political"},
+  {year:2014,country:"Nigeria",headline:"#BringBackOurGirls",text:"Worldwide movement against abductions of girls by Boko Haram Islamic group.",media:"https://i.guim.co.uk/img/static/sys-images/Guardian/Pix/pictures/2015/4/14/1429016131877/47191afd-dd36-4410-bf29-a037b38df179-2060x1236.jpeg?width=620&quality=85&auto=format&fit=max&s=f66bc4756ecf1a089e26546b838d8bcf",theme:"Human Rights"},
+  {year:2014,country:"Egypt",headline:"Muslim Youth Uprising",text:"Mass anti-government protests in Egypt due to political instability and an underperforming economy.",media:"",theme:"Political"},
+  {year:2015,country:"South Africa",headline:"#RhodesMustFall",text:"A movement petitioning the removal of the statue of Cecil John Rhodes at UCT.",media:"https://i.guim.co.uk/img/media/24da27c041ad4d66538bcae66439074e7b4a2f77/0_0_4256_2553/master/4256.jpg?width=1200&height=900&quality=85&auto=format&fit=crop&s=a9fdcda235679ce0ca0fef4b8b558a75",theme:"Social Justice"},
+  {year:2015,country:"South Sudan",headline:"The South Sudan We Want",text:"Women came together in a campaign to promote peace, social inclusion and national unity.",media:"",theme:"Peace"},
+  {year:2015,country:"South Africa",headline:"#FeesMustFall",text:"Nationwide demonstrations pushing for free tertiary education — the largest student protests since apartheid.",media:"https://c.files.bbci.co.uk/assets/d88df572-0b17-46ce-a872-7ef71f1b8bf7",theme:"Education"},
+  {year:2016,country:"Kenya",headline:"#Repeal162",text:"LGBTQI+ rights protest after the Kenyan High Court rejected a plea to decriminalise same-sex relationships.",media:"",theme:"Human Rights"},
+  {year:2016,country:"Zimbabwe",headline:"#Tajamuka/Sesjikile",text:"Movement blasting government for unemployment, corruption, and other national issues.",media:"",theme:"Governance"},
+  {year:2016,country:"Zimbabwe",headline:"#ThisFlag Movement",text:"Online-based campaign calling upon government to fix the economy and political despondency.",media:"https://www.accord.org.za/wp-content/uploads/2016/10/RTX2MV55.jpg",theme:"Governance"},
+  {year:2016,country:"Zimbabwe",headline:"#BeatThePot",text:"Women campaigning against economic crisis and political despondency under the Mugabe regime.",media:"",theme:"Economic"},
+  {year:2016,country:"Zimbabwe",headline:"#Occupy Africa Unity Square",text:"Protesters camped at Africa Unity Square to protest the socio-economic state of affairs.",media:"",theme:"Governance"},
+  {year:2016,country:"Zimbabwe",headline:"#ThisGown Protest",text:"Graduates protesting unemployment — founders arrested for wearing graduation gowns.",media:"",theme:"Economic"},
+  {year:2016,country:"Morocco",headline:"Hirak al-Rif Movement",text:"Mass protests in northern Morocco due to political grievances and lack of governance.",media:"",theme:"Governance"},
+  {year:2017,country:"Cameroon",headline:"#EndAnglophoneCrisis: Cameroon",text:"Cameroon's long-running Anglophone Crisis returned to the global spotlight.",media:"https://cms.qz.com/wp-content/uploads/2017/09/rtx3hh7i-e1506090288175.jpg?quality=75&strip=all&w=1600&h=903",theme:"Political"},
+  {year:2017,country:"Zimbabwe",headline:"Mugabe Must Go",text:"Citizens marched calling for the resignation of President Robert Mugabe.",media:"https://s.abcnews.com/images/International/zimbabwe-crisis-4-epa-jt-171118_16x9_992.jpg",theme:"Political"},
+  {year:2018,country:"Democratic Republic of Congo",headline:"Anti-Kabila Protests: 2018",text:"Massive protests calling for the ouster of President Kabila amid a political crisis.",media:"https://i.guim.co.uk/img/media/60c56c66f19bd1ffe9826e4659170609fa95cf56/10_0_3248_1949/master/3248.jpg?width=620&quality=85&auto=format&fit=max&s=4ea23f98f6e1b2c86627187e54834600",theme:"Political"},
+  {year:2018,country:"Zimbabwe",headline:"Post-Election Protest: Harare 2018",text:"Post-election march against President Mnangagwa's government, ending in violence.",media:"https://www.hrw.org/sites/default/files/styles/embed_xxl/public/multimedia_images_2018/201808africa_zimbabwe_election_violence.png?itok=NcMQfNAK",theme:"Political"},
+  {year:2019,country:"Zimbabwe",headline:"Fuel Hike Riots: 2019 / Total Shutdown",text:"Hundreds of Zimbabweans protested against the steep fuel hike — three civilians killed.",media:"https://www.aljazeera.com/wp-content/uploads/2019/01/955cddb3326b495d9a8876680810f400_18.jpeg?resize=770%2C513",theme:"Economic"},
+  {year:2019,country:"Zimbabwe",headline:"Zimbabwe Lawyers Petition Government",text:"Lawyers marched against deteriorating human rights and for constitutional restoration.",media:"",theme:"Human Rights"},
+  {year:2019,country:"Sudan",headline:"#BlueForSudan",text:"Thousands took part in a campaign to show solidarity with protesters in Sudan.",media:"https://www.aljazeera.com/wp-content/uploads/2019/06/3c5f6f69939d46d8aee09ac9f071d17b_18.jpeg?resize=770%2C513",theme:"Human Rights"},
+  {year:2019,country:"Zambia",headline:"Yellow Card Movement",text:"Citizens protested with the symbolic yellow card against misgovernance.",media:"",theme:"Governance"},
+  {year:2019,country:"Nigeria",headline:"#SayNoToSocialMediaBill: Nigeria",text:"Protests against the proposed Social Media Regulation Act in Nigeria.",media:"",theme:"Political"},
+  {year:2019,country:"South Africa",headline:"#NotInMyName; #AmINext; #SAShutDown",text:"Thousands of South African women marched to parliament against rising violence against women.",media:"https://i.guim.co.uk/img/media/b22f8c0f4ebd19eec3b9423a0d666267d06b2146/0_448_6720_4032/master/6720.jpg?width=620&quality=85&auto=format&fit=max&s=2d6d633a301b81a862cac720afb264a4",theme:"Gender"},
+  {year:2020,country:"Mali",headline:"Movement of June 5: Mali",text:"Insistence that President Keita resign over poor economy and insurgency sparked deadly violence.",media:"",theme:"Political"},
+  {year:2020,country:"Liberia",headline:"#RapeNationalEmergency: Liberia",text:"Police tear-gassed thousands of anti-rape activists requesting the government declare rape a national emergency.",media:"",theme:"Gender"},
+  {year:2020,country:"Namibia",headline:"#ShutItAllDown",text:"Hundreds of mainly younger women took to the streets of Windhoek against gender-based violence.",media:"",theme:"Gender"},
+  {year:2020,country:"Democratic Republic of Congo",headline:"#CongoIsBleeding",text:"Global attention on exploitation in DRC mines via a trending social media hashtag.",media:"",theme:"Social Justice"},
+  {year:2020,country:"Nigeria",headline:"#EndSARS",text:"Thousands of young Nigerians took to the streets to protest against police abuses.",media:"https://media.globalcitizen.org/thumbnails/1c/cf/1ccff09a-87ea-4263-b6a3-76be15325bfd/nigeria-sars-police-brutality-protests-movement-001.jpg__1600x900_q85_crop_subsampling-2.jpg",theme:"Human Rights"},
+  {year:2020,country:"Democratic Republic of Congo",headline:"Anti-Rwandese Security Agents Protest: DRC",text:"Hundreds in Goma protested the entry of Rwandese security agents into the region.",media:"",theme:"Political"},
+  {year:2021,country:"Ghana",headline:"#FixTheCountry",text:"Ghanaians protested pressuring the government to create jobs and reduce cost of living.",media:"https://assets.bwbx.io/images/users/iqjWHBFdfxIU/i2v0lIoyKJaA/v1/1000x-1.jpg",theme:"Governance"},
+  {year:2021,country:"Tunisia",headline:"Youth Unrest: Tunisia",text:"Tunisian youth clashed with police overnight, continuing protests over economic concerns.",media:"",theme:"Economic"},
+  {year:2021,country:"Sudan",headline:"Anti-Coup Protests: Sudan",text:"Five protesters were killed as huge crowds defied gunfire and tear gas against a military takeover.",media:"",theme:"Political"},
+  {year:2021,country:"Malawi",headline:"High Cost of Living and Corruption Protests: Malawi",text:"Police fired tear gas at 10,000 people protesting high cost of living and corruption.",media:"",theme:"Economic"},
+  {year:2021,country:"Burkina Faso",headline:"Anti-Government Protest: Burkina Faso",text:"Protesters called for President Roch Kabore's resignation over handling of national security.",media:"",theme:"Political"},
+  {year:2022,country:"Sudan",headline:"Pro-Democracy Protests: Sudan",text:"Thousands marched in Khartoum demanding a return to civilian rule.",media:"",theme:"Political"},
+  {year:2022,country:"Angola",headline:"Anti-Government Protest: Angola",text:"Taxi driver protests in Luanda escalated into political complaints.",media:"",theme:"Political"},
+  {year:2022,country:"Zimbabwe",headline:"Teachers Protest against low salaries",text:"Police arrested at least 16 teachers for demonstrating against poor salaries.",media:"",theme:"Labour"},
+  {year:2022,country:"Tunisia",headline:"Anti-Government Protest: Tunisia",text:"Police used tear gas and water cannons against protesters rallying against President Kais Saied.",media:"",theme:"Political"},
+  {year:2022,country:"Mali",headline:"Pro-Junta Protest: Mali",text:"Malians took to the streets supporting the military junta against ECOWAS sanctions.",media:"",theme:"Political"},
+  {year:2022,country:"Sudan",headline:"Medical Personnel Protests: Sudan",text:"Sudanese doctors protested violent attacks by security forces targeting medical personnel.",media:"",theme:"Human Rights"},
+  {year:2022,country:"Sudan",headline:"Anti-Government Protest: Sudan 2022",text:"Security forces killed seven protesters during rallies against the October 2021 military coup.",media:"",theme:"Political"},
+  {year:2022,country:"Burkina Faso",headline:"Insecurity & Solidarity for Mali protests",text:"Hundreds marched in Burkina Faso's towns to protest insecurity and show sympathy with Mali.",media:"",theme:"Political"},
+  {year:2022,country:"Sudan",headline:"Thousands continue to protest in Sudan",text:"Three protesters killed by troops in Khartoum; thousands marched toward the presidential palace.",media:"",theme:"Political"},
+  {year:2022,country:"Libya",headline:"Demonstration against the House of Representatives",text:"Protesters in Tripoli objected to the appointment of a new prime minister.",media:"",theme:"Political"},
+  {year:2022,country:"Senegal",headline:"Anti-Homosexuality Protests: Senegal",text:"Thousands marched in Dakar urging a stronger crackdown on homosexuality.",media:"",theme:"Social Justice"},
+  {year:2022,country:"Chad",headline:"Anti-Junta & Anti-France protest: Chad",text:"Over 500 people demonstrated against the ruling military junta and against France.",media:"",theme:"Political"},
+  {year:2022,country:"Nigeria",headline:"Nigeria's Gender Equality Agenda Amid Protests",text:"Nigerian women protested at the National Assembly over the rejection of gender equality legislation.",media:"",theme:"Gender"},
+  {year:2022,country:"Sudan",headline:"Wars are not fought on women's bodies: Sudan",text:"Sudanese marched to the presidential palace after reports of assault on a woman by security forces.",media:"",theme:"Gender"},
+  {year:2022,country:"South Africa",headline:"Stand together against xenophobia: South Africa",text:"Foreign nationals gathered in Cape Town to condemn prejudice in the wake of attacks on migrants.",media:"",theme:"Xenophobia"},
+  {year:2022,country:"Chad",headline:"Anti-French Protests: Chad",text:"Chadian police fired tear gas to disperse hundreds in an anti-French protest.",media:"",theme:"Political"},
+  {year:2022,country:"Democratic Republic of Congo",headline:"Anti-Rwanda Protests: DRC",text:"Hundreds protested in Kinshasa over Kigali's alleged backing for the M23 rebel organisation.",media:"",theme:"Political"},
+  {year:2022,country:"Guinea",headline:"Anti-Junta Protests: Guinea",text:"One person was killed during demonstrations against Guinea's junta.",media:"",theme:"Political"},
+  {year:2022,country:"Sierra Leone",headline:"Cost of Living Protests: Sierra Leone",text:"Security forces suppressed protesters; at least 21 demonstrators were killed.",media:"",theme:"Economic"},
+  {year:2022,country:"Sudan",headline:"Anti-Military Protests: Sudan",text:"117th protester killed since military coup; thousands marched toward the country's main airport.",media:"",theme:"Political"},
+  {year:2022,country:"Liberia",headline:"Anti-government Corruption: Liberia",text:"Hundreds demonstrated in Liberia's capital against corruption in President Weah's administration.",media:"",theme:"Governance"},
+  {year:2022,country:"Central African Republic",headline:"No to dictatorship: Central African Republic",text:"Some 300 people rallied against the president's decision to rewrite the constitution.",media:"",theme:"Political"},
+  {year:2022,country:"Zimbabwe",headline:"#FeesMustFall: Zimbabwe",text:"15 University of Zimbabwe students detained for protesting a 1,000% tuition fee increase.",media:"",theme:"Education"},
+  {year:2023,country:"Madagascar",headline:"Madagascar: opposition protests",text:"At least 16 injured as opposition protests rise ahead of presidential elections.",media:"",theme:"Political"},
+  {year:2023,country:"Democratic Republic of Congo",headline:"DR Congo: ban on protests",text:"DRC government bans protests against election irregularities.",media:"",theme:"Political"},
+  {year:2023,country:"Cameroon",headline:"Cameroon: women protest cost of living",text:"Women protest separatist war and cost of living on Pan-African Women's Day.",media:"",theme:"Economic"},
+  {year:2023,country:"South Africa",headline:"South Africa: student protest NSFAS",text:"Students protest new NSFAS payment scheme in Pretoria.",media:"",theme:"Education"},
+  {year:2023,country:"South Africa",headline:"South Africa: Pro-Palestinian Protest",text:"Pro-Palestine South Africans protest outside US consulate.",media:"",theme:"Political"},
+  {year:2023,country:"Tunisia",headline:"Tunisia: Protest hospital attack in Gaza",text:"Tunisians protest against the hospital attack in Gaza.",media:"",theme:"Political"},
+  {year:2023,country:"Morocco",headline:"Morocco: Protest hospital attack in Gaza",text:"Moroccans protest against the hospital attack in Gaza.",media:"",theme:"Political"},
+  {year:2023,country:"Kenya",headline:"Kenya: protests against tax hikes",text:"Kenya's opposition staged protests against proposed tax hikes.",media:"",theme:"Economic"},
+  {year:2023,country:"South Africa",headline:"South Africa: Cost of Living protest",text:"COSATU members take part in nationwide protest against high cost of living.",media:"",theme:"Economic"},
+  {year:2023,country:"Senegal",headline:"Senegal: youths are angry",text:"Spontaneous protests by youth with no future prospects.",media:"",theme:"Economic"},
+  {year:2023,country:"Democratic Republic of Congo",headline:"DR Congo: protest standard of living",text:"Protests against falling standard of living in DRC.",media:"",theme:"Economic"},
+  {year:2023,country:"South Africa",headline:"South Africa: Anti Dutch Royalty",text:"Protests as Dutch King Willem-Alexander visited South Africa and the Slave Lodge.",media:"",theme:"Social Justice"},
+  {year:2023,country:"South Africa",headline:"South Africa: Minibus strikes and protests",text:"Cape Town impounded minibus taxis sparking strikes that paralysed the city.",media:"",theme:"Labour"},
+  {year:2023,country:"South Africa",headline:"South Africa: Service delivery protests",text:"National Shutdown called as Eskom unable to deliver sufficient power.",media:"",theme:"Service Delivery"},
+  {year:2023,country:"Mozambique",headline:"Mozambique: Municipal election fraud protests",text:"Accusations of voter fraud against the ruling party after elections.",media:"",theme:"Political"},
+  {year:2023,country:"Mozambique",headline:"Mozambique: Azagaia protests",text:"Protests following the death of rapper Edson da Luz (Azagaia), an anti-government critic.",media:"",theme:"Political"},
+  {year:2023,country:"Malawi",headline:"Malawi: Anti-LGBT protest",text:"Protests over colonial-era anti-sodomy legislation.",media:"",theme:"Human Rights"},
+  {year:2023,country:"Central African Republic",headline:"CAR: Constitutional Referendum protest",text:"Protests over a planned referendum that could extend President Touadéra's rule.",media:"",theme:"Political"},
+  {year:2023,country:"Ethiopia",headline:"Ethiopia: Withdrawal of outside forces protest",text:"Protests as Amhara and Eritrean troops remained in Tigrayan territory.",media:"",theme:"Political"},
+  {year:2023,country:"Ethiopia",headline:"Ethiopia: Special forces integration protests",text:"Government ordered regions' special forces integrated into the federal military.",media:"",theme:"Political"},
+  {year:2023,country:"Ethiopia",headline:"Ethiopia: Water Shortage Protests",text:"Protests over severe water shortages affecting communities.",media:"",theme:"Environment"},
+  {year:2023,country:"Chad",headline:"Chad: 1st anniversary of govt crackdown",text:"One year anniversary of crackdown that killed 128 and injured more than 500.",media:"",theme:"Political"},
+  {year:2023,country:"Nigeria",headline:"Nigeria: Mohbad protest",text:"Popular Afrobeats star Mohbad died under suspicious circumstances prompting protests.",media:"",theme:"Social Justice"},
+  {year:2023,country:"Nigeria",headline:"Nigeria: Fuel subsidy strike and protest",text:"Government stopped subsidizing fuel causing prices to rise dramatically.",media:"",theme:"Economic"},
+  {year:2023,country:"Nigeria",headline:"Nigeria: 2023 election protests",text:"Protests after ruling party candidate Bola Ahmed Tinubu was declared winner.",media:"",theme:"Political"},
+  {year:2023,country:"Nigeria",headline:"Nigeria: Cash shortage protests",text:"Central bank introduced new currency creating cash shortages during transition.",media:"",theme:"Economic"},
+  {year:2023,country:"Ghana",headline:"Ghana: 2023 economic protests",text:"Multi-day protests over economic crisis in Ghana's capital.",media:"",theme:"Economic"},
+  {year:2023,country:"Libya",headline:"Libya: Derna flood protest",text:"Protests after two dams broke in Derna causing flash floods that killed thousands.",media:"",theme:"Governance"},
+  {year:2023,country:"Libya",headline:"Libya: Anti-Israel protests",text:"Protests after Israeli Foreign Minister revealed a secret meeting with the Libyan counterpart.",media:"",theme:"Political"},
+  {year:2023,country:"Morocco",headline:"Morocco: IMF/World Bank Counter Summit",text:"Counter-summit protest held during annual IMF/World Bank meeting in Marrakech.",media:"",theme:"Economic"},
+  {year:2023,country:"Senegal",headline:"Senegal: Gendarmerie protests",text:"Protests over gendarmes planning to construct a post on community land.",media:"",theme:"Governance"},
+  {year:2023,country:"Senegal",headline:"Senegal: Ousmane Sonko protests",text:"Protests as opposition leader Ousmane Sonko faced trial for libel charges.",media:"",theme:"Political"},
+  {year:2023,country:"Senegal",headline:"Senegal: protests following Sonko conviction",text:"Continued protests following the conviction of opposition leader Ousmane Sonko.",media:"",theme:"Political"},
+  {year:2023,country:"Sierra Leone",headline:"Sierra Leone: 2023 Election protests",text:"Electoral commissioners called to resign after failing to release voter registry.",media:"",theme:"Political"},
+  {year:2023,country:"Burkina Faso",headline:"Burkina Faso: Nouna security protest",text:"Protests after jihadist insurgents killed six people in Nouna.",media:"",theme:"Security"},
+  {year:2023,country:"Burkina Faso",headline:"Burkina Faso: Partiaga security protest",text:"Protests after jihadist insurgents killed at least 60 people in Partiaga.",media:"",theme:"Security"},
+  {year:2023,country:"Niger",headline:"Niger: Anti-France protests",text:"Huge protests calling for French forces to leave after the coup.",media:"",theme:"Political"},
+  {year:2023,country:"Niger",headline:"Niger: Coup protest",text:"Protests after soldiers deposed President Mohamed Bazoum in a coup.",media:"",theme:"Political"},
+  {year:2023,country:"Kenya",headline:"Kenya: 2023 inflation protests",text:"Protests as inflation rose and a proposed finance bill sought to hike taxes on fuel.",media:"",theme:"Economic"},
+  {year:2023,country:"Uganda",headline:"Uganda: Police Brutality Protest",text:"Protests over Ugandan police using excessive force to disperse events by female lawmakers.",media:"",theme:"Human Rights"},
+  {year:2023,country:"Democratic Republic of Congo",headline:"DRC: Presidential election results protest",text:"Protests after incumbent President Felix Tshisekedi won the December 2023 election.",media:"",theme:"Political"},
+  {year:2023,country:"Democratic Republic of Congo",headline:"DRC: Voter registration irregularity protest",text:"Delays and alleged irregularities in a voter registration drive.",media:"",theme:"Political"},
+  {year:2023,country:"Cameroon",headline:"Cameroon: Detained youth protests",text:"The military detained about 30 youths for suspected involvement in rebel activity.",media:"",theme:"Political"},
+  {year:2024,country:"Senegal",headline:"Senegal: protest over election delay",text:"Student killed in turbulent protests over election delay in Senegal.",media:"",theme:"Political"},
+  {year:2024,country:"Nigeria",headline:"Nigeria: labour union strikes",text:"Nigeria's largest labor unions on strike to demand a salary increase.",media:"",theme:"Labour"},
+  {year:2024,country:"Kenya",headline:"Kenya: teacher protests",text:"Teacher protests resurgence from April to May 2024.",media:"",theme:"Labour"},
+  {year:2024,country:"Niger",headline:"Niger: protest to demand US troops leave",text:"Hundreds protest in Niger demanding departure of US troops.",media:"",theme:"Political"},
+  {year:2024,country:"Democratic Republic of Congo",headline:"DR Congo: anti-Western protests",text:"Anti-western protests take place in Kinshasa.",media:"",theme:"Political"},
+  {year:2024,country:"Nigeria",headline:"Nigeria: cost of living protests",text:"Nigerians protest soaring cost of living.",media:"",theme:"Economic"},
+  {year:2024,country:"Tunisia",headline:"Tunisia: protest falling living standards",text:"Thousands protest against the socio-economic crisis in Tunisia.",media:"",theme:"Economic"},
+  {year:2024,country:"Kenya",headline:"Kenya: protests against tax hikes (Finance Bill)",text:"200+ arrested over finance bill protests. President withdraws the finance bill on June 26.",media:"https://www.aljazeera.com/wp-content/uploads/2024/06/2024-06-18T120907Z_25539206_RC2OD8A79E6L_RTRMADP_3_KENYA-BUDGET-1718724528.jpg?resize=770%2C513&quality=80",theme:"Economic"},
+  {year:2024,country:"Nigeria",headline:"#EndBadGovernance protests",text:"#EndBadGovernance protests in Nigeria from August 1–10, triggered by rising cost of living.",media:"",theme:"Governance"},
+  {year:2024,country:"South Africa",headline:"South Africa: taxi driver protest",text:"Ongoing protest closes major highways near Mthatha, Eastern Cape Province.",media:"",theme:"Labour"},
+  {year:2024,country:"South Africa",headline:"South Africa: cancer-treatment fund protest",text:"Cancer patients and advocates protest the government's failure to use allocated funds for radiotherapy.",media:"",theme:"Health"},
+  {year:2024,country:"Congo",headline:"Congo: players protest before Africa Cup",text:"Congo players protest before Africa Cup of Nations semifinal against armed violence.",media:"",theme:"Political"},
+];
+
+const COUNTRY_COORDS = {
+  "South Africa":{lat:-29,lon:25},"Zimbabwe":{lat:-20,lon:30},"Nigeria":{lat:9,lon:8},
+  "Egypt":{lat:27,lon:30},"Kenya":{lat:-1,lon:37},"Sudan":{lat:15,lon:30},
+  "Senegal":{lat:14,lon:-14},"Tunisia":{lat:34,lon:9},"Morocco":{lat:32,lon:-6},
+  "Ghana":{lat:8,lon:-1},"Burkina Faso":{lat:12,lon:-2},"Mali":{lat:17,lon:-4},
+  "Niger":{lat:17,lon:8},"Ethiopia":{lat:9,lon:40},"Cameroon":{lat:4,lon:12},
+  "Democratic Republic of Congo":{lat:-4,lon:24},"Uganda":{lat:1,lon:32},
+  "Angola":{lat:-12,lon:17},"Zambia":{lat:-14,lon:28},"Mozambique":{lat:-18,lon:35},
+  "Namibia":{lat:-22,lon:17},"Botswana":{lat:-22,lon:24},
+  "Chad":{lat:15,lon:19},"Libya":{lat:27,lon:17},"Madagascar":{lat:-20,lon:47},
+  "Malawi":{lat:-13,lon:34},"Sierra Leone":{lat:8,lon:-12},"Liberia":{lat:6,lon:-9},
+  "Guinea":{lat:11,lon:-11},"Lesotho":{lat:-29.5,lon:28.5},"Eswatini":{lat:-26.5,lon:31.5},
+  "South Sudan":{lat:7,lon:30},"Rwanda":{lat:-2,lon:30},"Congo":{lat:-1,lon:15},
+  "Central African Republic":{lat:7,lon:21},
+};
+
+const THEME_COLORS = {
+  "Political":"#3266ad","Economic":"#d85a30","Human Rights":"#7f77dd",
+  "Governance":"#0f6e56","Labour":"#ba7517","Gender":"#d4537e",
+  "Social Justice":"#1d9e75","Education":"#639922","Xenophobia":"#993556",
+  "Environment":"#188038","Service Delivery":"#5f5e5a","Health":"#185fa5",
+  "Security":"#a32d2d","Peace":"#3b6d11",
+};
+
+const REGION_MAP = {
+  "South Africa":"Southern Africa","Zimbabwe":"Southern Africa","Zambia":"Southern Africa",
+  "Mozambique":"Southern Africa","Namibia":"Southern Africa","Botswana":"Southern Africa",
+  "Lesotho":"Southern Africa","Eswatini":"Southern Africa","Malawi":"Southern Africa",
+  "Angola":"Southern Africa","Nigeria":"West Africa","Senegal":"West Africa",
+  "Ghana":"West Africa","Mali":"West Africa","Burkina Faso":"West Africa",
+  "Niger":"West Africa","Sierra Leone":"West Africa","Liberia":"West Africa",
+  "Guinea":"West Africa","Congo":"Central Africa","Egypt":"North Africa",
+  "Tunisia":"North Africa","Morocco":"North Africa","Libya":"North Africa",
+  "Sudan":"East Africa","Ethiopia":"East Africa","Kenya":"East Africa",
+  "Uganda":"East Africa","Rwanda":"East Africa","South Sudan":"East Africa",
+  "Madagascar":"East Africa","Cameroon":"Central Africa",
+  "Democratic Republic of Congo":"Central Africa","Central African Republic":"Central Africa",
+  "Chad":"Central Africa",
+};
+
+const W = 680, H = 780;
+let yearMin = 2008, yearMax = 2024;
+let worldTopo = null, activeChart = null, activeChart2 = null;
+
+function getProjection() {
+  return d3.geoMercator().center([22,-2]).scale(600).translate([W/2-20,H/2+10]);
+}
+function filteredEvents() { return EVENTS.filter(e=>e.year>=yearMin&&e.year<=yearMax); }
+
+function updateMetrics() {
+  const evs = filteredEvents();
+  const countries = new Set(evs.map(e=>e.country)).size;
+  const themes = {}; evs.forEach(e=>{themes[e.theme]=(themes[e.theme]||0)+1;});
+  const topTheme = Object.entries(themes).sort((a,b)=>b[1]-a[1])[0]?.[0]||"—";
+  document.getElementById("metrics-row").innerHTML = `
+    <div class="metric"><div class="metric-label">Total movements</div><div class="metric-value" style="color:#3266ad">${evs.length}</div></div>
+    <div class="metric"><div class="metric-label">Countries</div><div class="metric-value" style="color:#d85a30">${countries}</div></div>
+    <div class="metric"><div class="metric-label">Years shown</div><div class="metric-value">${yearMin}–${yearMax}</div></div>
+    <div class="metric"><div class="metric-label">Top theme</div><div class="metric-value" style="font-size:13px;color:#7f77dd">${topTheme}</div></div>
+  `;
+}
+
+function pickFeaturedEvent(country, evs) {
+  const withImg = evs.filter(e=>e.country===country&&e.media&&e.media.startsWith("http")&&!e.media.includes("youtube")&&!e.media.includes("youtu.be"));
+  return withImg[0] || evs.find(e=>e.country===country) || null;
+}
+
+function updateBubbles() {
+  const evs = filteredEvents();
+  const counts = {}; evs.forEach(e=>{counts[e.country]=(counts[e.country]||0)+1;});
+  const maxCount = Math.max(...Object.values(counts),1);
+  const top3 = new Set(Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,3).map(d=>d[0]));
+  const projection = getProjection();
+  const isDark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const tooltip = document.getElementById("rich-tooltip");
+
+  d3.select("#map-container svg").selectAll(".bubble-g").remove();
+  const svg = d3.select("#map-container svg");
+
+  Object.entries(COUNTRY_COORDS).forEach(([cName,coords])=>{
+    const count = counts[cName]||0; if(!count) return;
+    const proj = projection([coords.lon,coords.lat]); if(!proj) return;
+    const [x,y]=proj; if(x<0||x>W||y<0||y>H) return;
+    const r = 12+(count/maxCount)*32;
+    const ct={}; evs.filter(e=>e.country===cName).forEach(e=>{ct[e.theme]=(ct[e.theme]||0)+1;});
+    const topT=Object.entries(ct).sort((a,b)=>b[1]-a[1])[0]?.[0]||"Political";
+    const col=THEME_COLORS[topT]||"#3266ad";
+    const isTop3=top3.has(cName);
+    const g=svg.append("g").attr("class","bubble-g").style("cursor","pointer");
+    if(isTop3){g.append("circle").attr("cx",x).attr("cy",y).attr("r",r+4).attr("fill","none").attr("stroke",col).attr("stroke-width",1.5).attr("stroke-dasharray","3 3").attr("opacity",0.6);}
+    g.append("circle").attr("cx",x).attr("cy",y).attr("r",r).attr("fill",col).attr("fill-opacity",0.82).attr("stroke","#fff").attr("stroke-width",1.5);
+    g.append("text").attr("x",x).attr("y",y+4).attr("text-anchor","middle").attr("font-size",Math.max(9,Math.min(13,r-2))).attr("font-weight","500").attr("fill","#fff").text(count);
+    g.on("click",()=>renderCountry(cName));
+    g.on("mouseenter",function(){
+      d3.select(this).selectAll("circle").filter((_,i,nodes)=>nodes.length>1?i===nodes.length-2:true).attr("fill-opacity",1);
+      if(isTop3){
+        const svgEl=document.querySelector("#map-container svg");
+        const svgRect=svgEl.getBoundingClientRect();
+        const scaleX=svgRect.width/W, scaleY=svgRect.height/H;
+        const outerRect=document.getElementById("map-outer").getBoundingClientRect();
+        const svgOffX=svgRect.left-outerRect.left, svgOffY=svgRect.top-outerRect.top;
+        const px=x*scaleX+svgOffX, py=y*scaleY+svgOffY;
+        const tipW=260; const containerW=document.getElementById("map-outer").offsetWidth;
+        let left=px+r*scaleX+10; let top=py-20;
+        if(left+tipW>containerW) left=px-r*scaleX-tipW-10;
+        if(top<0) top=0;
+        tooltip.style.left=left+"px"; tooltip.style.top=top+"px";
+        const featured=pickFeaturedEvent(cName,evs);
+        document.getElementById("tip-country").textContent=`${cName} · ${count} movements`;
+        document.getElementById("tip-headline").textContent=featured?featured.headline:"Various movements recorded";
+        const imgWrap=document.getElementById("tip-img-wrap");
+        imgWrap.innerHTML=""; imgWrap.style.background="";
+        if(featured&&featured.media&&featured.media.startsWith("http")){
+          const img=document.createElement("img"); img.src=featured.media; img.alt="";
+          img.style.cssText="width:72px;height:54px;object-fit:cover;border-radius:8px;flex-shrink:0;";
+          img.onerror=()=>{imgWrap.style.background=col+"22";imgWrap.innerHTML=`<span style="font-size:20px;">📍</span>`;};
+          imgWrap.appendChild(img);
+        } else { imgWrap.style.background=col+"22"; imgWrap.innerHTML=`<span style="font-size:20px;">📍</span>`; }
+        tooltip.classList.add("visible");
+      } else {
+        const tip=svg.append("g").attr("id","simple-tooltip").attr("pointer-events","none");
+        const tx=x>W-140?x-110:x+12; const ty=y<20?y+20:y-8;
+        const lbl=`${cName}: ${count} movement${count>1?"s":""}`;
+        tip.append("rect").attr("x",tx-5).attr("y",ty-14).attr("width",lbl.length*6.5+12).attr("height",22).attr("rx",4).attr("fill",isDark?"#333":"#fff").attr("stroke","#ccc").attr("stroke-width",0.5);
+        tip.append("text").attr("x",tx+1).attr("y",ty+2).attr("font-size",11).attr("fill",isDark?"#fff":"#333").text(lbl);
+      }
+    });
+    g.on("mouseleave",function(){
+      d3.select(this).selectAll("circle").attr("fill-opacity",(d,i,nodes)=>nodes.length>1&&i===nodes.length-2?0.82:undefined).filter((_,i,nodes)=>i===nodes.length-2).attr("fill-opacity",0.82);
+      tooltip.classList.remove("visible"); svg.select("#simple-tooltip").remove();
+    });
+  });
+}
+
+function initMap(){
+  const isDark=matchMedia("(prefers-color-scheme: dark)").matches;
+  document.getElementById("map-container").innerHTML="";
+  const projection=getProjection(); const path=d3.geoPath(projection);
+  const svg=d3.select("#map-container").append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("width","100%").style("background",isDark?"#1a1a1a":"#dbeef4");
+  const AFRICA=new Set([12,24,204,72,86,854,108,120,132,140,148,174,180,231,232,262,266,288,324,404,426,430,434,454,466,478,504,516,562,566,646,686,694,706,710,716,728,732,740,788,800,818,834,894,178,638]);
+  const allC=topojson.feature(worldTopo,worldTopo.objects.countries).features;
+  svg.selectAll(".country").data(allC.filter(d=>AFRICA.has(+d.id))).join("path").attr("class","country").attr("d",path).attr("fill",isDark?"#2d3748":"#b8d4c0").attr("stroke",isDark?"#4a5568":"#fff").attr("stroke-width",0.5);
+  updateBubbles();
+}
+
+function renderLegend(){
+  document.getElementById("legend").innerHTML=Object.entries(THEME_COLORS).map(([t,c])=>`<span><span class="legend-dot" style="background:${c}"></span>${t}</span>`).join("");
+}
+
+function setupRangeSlider(){
+  const minEl=document.getElementById("range-min"),maxEl=document.getElementById("range-max"),fill=document.getElementById("range-fill"),label=document.getElementById("year-label");
+  function upd(){const mn=+minEl.value,mx=+maxEl.value;const pMn=(mn-2008)/16*100,pMx=(mx-2008)/16*100;fill.style.left=pMn+"%";fill.style.width=(pMx-pMn)+"%";label.textContent=mn+" – "+mx;}
+  minEl.addEventListener("input",()=>{if(+minEl.value>+maxEl.value)minEl.value=maxEl.value;yearMin=+minEl.value;upd();updateMetrics();updateBubbles();});
+  maxEl.addEventListener("input",()=>{if(+maxEl.value<+minEl.value)maxEl.value=minEl.value;yearMax=+maxEl.value;upd();updateMetrics();updateBubbles();});
+  upd();
+}
+
+function renderCountry(country){
+  document.getElementById("map-view").style.display="none";
+  document.getElementById("country-view").style.display="block";
+  document.getElementById("subtitle-text").textContent="← Back to explore another country";
+  document.getElementById("rich-tooltip").classList.remove("visible");
+  if(activeChart){activeChart.destroy();activeChart=null;}
+  if(activeChart2){activeChart2.destroy();activeChart2=null;}
+  const events=EVENTS.filter(e=>e.country===country).sort((a,b)=>a.year-b.year);
+  const region=REGION_MAP[country]||"";
+  const years=[...new Set(events.map(e=>e.year))].sort((a,b)=>a-b);
+  const yc={};events.forEach(e=>{yc[e.year]=(yc[e.year]||0)+1;});
+  const tc={};events.forEach(e=>{tc[e.theme]=(tc[e.theme]||0)+1;});
+  const cv=document.getElementById("country-view");
+  cv.innerHTML=`
+    <div class="country-header">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="back-btn" id="back-btn"><i class="ti ti-arrow-left"></i> All countries</button>
+        <div><h2 style="font-size:20px;font-weight:500;">${country}</h2>${region?`<span style="font-size:12px;color:#888;">${region}</span>`:""}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div class="metric" style="min-width:80px;"><div class="metric-label">Movements</div><div class="metric-value" style="color:#3266ad">${events.length}</div></div>
+        <div class="metric" style="min-width:80px;"><div class="metric-label">First year</div><div class="metric-value">${years[0]}</div></div>
+        <div class="metric" style="min-width:80px;"><div class="metric-label">Last year</div><div class="metric-value">${years[years.length-1]}</div></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div><p class="chart-label">Movements per year</p><div class="chart-wrap"><canvas id="yearChart" role="img" aria-label="Movements per year in ${country}"></canvas></div></div>
+      <div><p class="chart-label">By theme</p><div class="chart-wrap"><canvas id="themeChart" role="img" aria-label="Themes in ${country}"></canvas></div></div>
+    </div>
+    <p class="section-title">Timeline</p>
+    <div class="timeline-wrap" id="timeline"></div>
+  `;
+  document.getElementById("back-btn").addEventListener("click",()=>{
+    document.getElementById("country-view").style.display="none";
+    document.getElementById("map-view").style.display="block";
+    document.getElementById("subtitle-text").textContent="Click a country bubble to explore its protest history.";
+  });
+  const isDark=matchMedia("(prefers-color-scheme: dark)").matches;
+  const tC=isDark?"#ccc":"#555",gC=isDark?"rgba(255,255,255,0.1)":"rgba(0,0,0,0.07)";
+  const bC=years.map(y=>{const t={};events.filter(e=>e.year===y).forEach(e=>{t[e.theme]=(t[e.theme]||0)+1;});return THEME_COLORS[Object.entries(t).sort((a,b)=>b[1]-a[1])[0]?.[0]]||"#3266ad";});
+  activeChart=new Chart(document.getElementById("yearChart"),{type:"bar",data:{labels:years,datasets:[{data:years.map(y=>yc[y]),backgroundColor:bC,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tC,font:{size:10}},grid:{display:false}},y:{ticks:{color:tC,font:{size:10},stepSize:1},grid:{color:gC}}}}});
+  const tK=Object.keys(tc);
+  activeChart2=new Chart(document.getElementById("themeChart"),{type:"doughnut",data:{labels:tK,datasets:[{data:Object.values(tc),backgroundColor:tK.map(t=>THEME_COLORS[t]||"#888"),borderWidth:1,borderColor:isDark?"#222":"#fff"}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:"right",labels:{color:tC,font:{size:10},boxWidth:10,padding:6}}}}});
+  const tl=document.getElementById("timeline");
+  events.forEach(ev=>{
+    const col=THEME_COLORS[ev.theme]||"#3266ad";
+    const wrap=document.createElement("div"); wrap.className="tl-item";
+    const hasImg=ev.media&&ev.media.startsWith("http")&&!ev.media.includes("youtube")&&!ev.media.includes("youtu.be");
+    wrap.innerHTML=`
+      <div class="tl-line"><div class="tl-dot" style="background:${col}"></div><div class="tl-connector"></div></div>
+      <div class="event-card">
+        <div class="event-inner">
+          <div style="flex:1;min-width:0;">
+            <div class="event-meta">
+              <span class="event-year">${ev.year}</span>
+              <span class="event-theme" style="background:${col}22;color:${col};">${ev.theme}</span>
+            </div>
+            <p class="event-headline">${ev.headline}</p>
+            <p class="event-text">${ev.text}</p>
+          </div>
+          ${hasImg?`<img class="event-img" src="${ev.media}" alt="" onerror="this.style.display='none'">` : ""}
+        </div>
+      </div>`;
+    tl.appendChild(wrap);
+  });
+}
+
+d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(world=>{
+  worldTopo=world; updateMetrics(); initMap(); setupRangeSlider(); renderLegend();
+});
+</script>
+</body>
+</html>
